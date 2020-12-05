@@ -687,11 +687,13 @@ process_iq(LServer, #iq{from = #jid{luser = LUser}, lang = Lang,
 		#mam_query{rsm = #rsm_set{index = I}} when is_integer(I) ->
 		    Txt = ?T("Unsupported <index/> element"),
 		    xmpp:make_error(IQ, xmpp:err_feature_not_implemented(Txt, Lang));
-		#mam_query{rsm = RSM, flippage = FlipPage, xmlns = NS} ->
+%%		#mam_query{rsm = RSM, flippage = FlipPage, xmlns = NS} ->
+		#mam_query{rsm = RSM, xmlns = NS} ->
 		    case parse_query(SubEl, Lang) of
 			{ok, Query} ->
 			    NewRSM = limit_max(RSM, NS),
-			    select_and_send(LServer, Query, NewRSM, FlipPage, IQ, MsgType);
+%%			    select_and_send(LServer, Query, NewRSM, FlipPage, IQ, MsgType);
+			    select_and_send(LServer, Query, NewRSM, IQ, MsgType);
 			{error, Err} ->
 			    xmpp:make_error(IQ, Err)
 		    end
@@ -1017,7 +1019,8 @@ maybe_activate_mam(LUser, LServer) ->
 	    ok
     end.
 
-select_and_send(LServer, Query, RSM, FlipPage, #iq{from = From, to = To} = IQ, MsgType) ->
+%%select_and_send(LServer, Query, RSM, FlipPage, #iq{from = From, to = To} = IQ, MsgType) ->
+select_and_send(LServer, Query, RSM,  #iq{from = From, to = To} = IQ, MsgType) ->
     Ret = case MsgType of
 	      chat ->
 		  select(LServer, From, From, Query, RSM, MsgType);
@@ -1027,10 +1030,11 @@ select_and_send(LServer, Query, RSM, FlipPage, #iq{from = From, to = To} = IQ, M
     case Ret of
 	{Msgs, IsComplete, Count} ->
 	    SortedMsgs = lists:keysort(2, Msgs),
-	    SortedMsgs2 = case FlipPage of
-	                       true -> lists:reverse(SortedMsgs);
-	                       false -> SortedMsgs
-	                  end,
+%%	    SortedMsgs2 = case FlipPage of
+%%	                       true -> lists:reverse(SortedMsgs);
+%%	                       false -> SortedMsgs
+%%	                  end,
+		SortedMsgs2 =  SortedMsgs,
 	    send(SortedMsgs2, Count, IsComplete, IQ);
 	{error, _} ->
 	    Txt = ?T("Database failure"),
