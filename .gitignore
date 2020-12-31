@@ -4,6 +4,9 @@
 *~
 \#*#
 .#*
+.idea/
+log/
+database/
 .edts
 *.dump
 /Makefile
@@ -47,3 +50,4 @@ XmppAddr.hrl
 /_build
 /mnesiadb
 /.rebar
+config/ejabberd.yml
